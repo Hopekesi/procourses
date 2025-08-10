@@ -120,6 +120,8 @@ export async function getPaper(req, res) {
 
         //validation
         if (!user) throw new Error(`User  not found`);
+        if (user.tokens<1) throw new Error(`Insufficient Tokens`);
+        
         if (typeof course !== "string") throw new Error("Select a course ");
         if (typeof session !== "string") throw new Error("Select a session ");
 
