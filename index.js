@@ -15,16 +15,23 @@ app.use((req, res, next) => {
 
 
 app.use('/procourses/',courseRoute);
+
 app.get('/meta/',(req,res)=>{
   console.log(req)
+  res.send("get ok")
 });
+
 app.post('/meta/',(req,res)=>{
   console.log('start of post req')
   console.log(req)
   console.log('end of post req')
 });
 
+app.use('/',()=>{
+  console.log("....")
+  res.send("ok")
+});
 app.listen(cfg.PORT, async () => {
-  await connectDB();
+  //await connectDB();
   console.log(`Server running on port http://localhost:${cfg.PORT}`);
 });
