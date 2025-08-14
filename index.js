@@ -15,6 +15,14 @@ app.use((req, res, next) => {
 
 
 app.use('/procourses/',courseRoute);
+app.get('/meta/',(req,res)=>{
+  console.log(req)
+});
+app.post('/meta/',(req,res)=>{
+  console.log('start of post req')
+  console.log(req)
+  console.log('end of post req')
+});
 
 app.listen(cfg.PORT, async () => {
   await connectDB();
