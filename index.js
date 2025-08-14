@@ -18,7 +18,7 @@ app.use('/procourses/',courseRoute);
 
 app.get('/meta/',(req,res)=>{
   console.log(req)
-  res.send("get ok")
+  res.send(1416153129)
 });
 
 app.post('/meta/',(req,res)=>{
