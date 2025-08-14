@@ -27,11 +27,11 @@ app.post('/meta/',(req,res)=>{
   console.log('end of post req')
 });
 
-app.use('/',()=>{
+app.use('/',(req,res)=>{
   console.log("....")
   res.send("ok")
 });
 app.listen(cfg.PORT, async () => {
-  //await connectDB();
+  await connectDB();
   console.log(`Server running on port http://localhost:${cfg.PORT}`);
 });
