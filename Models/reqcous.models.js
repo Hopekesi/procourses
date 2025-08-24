@@ -36,6 +36,6 @@ const reqcoschema = new mongoose.Schema({
     },
 });
 
-const courseReq = mongoose.model('newCourseR',reqcoschema)
+const courseReq = mongoose.model('proCourse',reqcoschema)
 
 export default courseReq;

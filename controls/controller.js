@@ -8,6 +8,7 @@ const GITHUB_TOKENs = [cfg.gk1, cfg.gk2, cfg.gk3, cfg.gk4, cfg.gk5, cfg.gk6];
 
 let token;
 let rateLeft;
+
 await selectToken();
 
 async function checkLimit(Tk) {
@@ -22,6 +23,7 @@ async function checkLimit(Tk) {
     let remaining = await tester.get("/rate_limit");
     remaining = remaining.data.resources.core.remaining;
     rateLeft = remaining;
+
     if (remaining > 5) return "high";
     return "low";
 }
@@ -57,8 +59,7 @@ export async function getCourses(req, res) {
         //get the courses
         const onlineCourses = await githubApi.get(`/users/UniportPQ/repos`);
         // Format the Online Courses data
-        const ourCourses = onlineCourses.data.map((repo) => repo.name);
-
+        const ourCourses = onlineCourses.data.map(repo => repo.name);
         res.send(ourCourses);
     } catch (err) {
         res.status(500).json({
@@ -75,7 +76,7 @@ export async function getCoursesD(req, res) {
         const onlineCourses = await githubApi.get(`/users/UniportPQ/repos`);
 
         // Format the Online Courses data
-        const ourCourses = onlineCourses.data.map((repo) => ({
+        const ourCourses = onlineCourses.data.map(repo => ({
             name: repo.name,
             description: repo.description
         }));
@@ -100,7 +101,7 @@ export async function getSessions(req, res) {
             `/repos/UniportPQ/${course}/contents/`
         );
         // Format the Online Courses data
-        const ourYears = availableYears.data.map((repo) => repo.name);
+        const ourYears = availableYears.data.map(repo => repo.name);
 
         res.send(ourYears);
     } catch (e) {
@@ -120,8 +121,8 @@ export async function getPaper(req, res) {
 
         //validation
         if (!user) throw new Error(`User  not found`);
-        if (user.tokens<1) throw new Error(`Insufficient Tokens`);
-        
+        if (user.tokens < 1) throw new Error(`Insufficient Tokens`);
+
         if (typeof course !== "string") throw new Error("Select a course ");
         if (typeof session !== "string") throw new Error("Select a session ");
 
@@ -138,15 +139,48 @@ export async function getPaper(req, res) {
             ip: req.ip
         });
 
-        await deductTokens(id, -1, `Requested ${course} ${session}.`);
+        let userSeen = await deductTokens(
+            id,
+            -1,
+            `Requested ${course} ${session}.`
+        );
+
         await newReq.save();
 
         //send Past Question
-        res.json(paper.data);
+        res.json({
+            user: userSeen,
+            pq: paper.data
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({
             error: `Failed to fetch paper : ${err}`
         });
+    }
+}
+
+export async function getLimits(req, res) {
+    try {
+        let TKN = null;
+        let counts = [];
+        for (let Tk of GITHUB_TOKENs) {
+            let tester = axios.create({
+                baseURL: cfg.GAU,
+                headers: {
+                    "User-Agent": "Express.js GitHub API Client",
+                    Authorization: `token ${Tk}`
+                }
+            });
+
+            let remaining = await tester.get("/rate_limit");
+            remaining = remaining.data.resources.core.remaining;
+            console.log(remaining) 
+            counts.push(remaining)
+        }
+        res.send(counts);
+    } catch (err) {
+        console.log(err.message);
+        res.send(err.message);
     }
 }

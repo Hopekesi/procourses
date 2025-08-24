@@ -7,50 +7,50 @@ const UserSchema = new mongoose.Schema({
         minLength: 26, // Minimum BTC address length (e.g., P2PKH)
         maxLength: 35, // Maximum BTC address length (e.g., Bech32)
         match: /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/, // Basic BTC address regex
-        required: [true,"Regenerate another wallet adders"] // Optional: Enforce wallet creation
+        required: [true, "Regenerate another wallet adders"] // Optional: Enforce wallet creation
     },
-    
+
     gmail: {
         type: String,
         lowercase: true,
-        minLength:5,
-        maxLength:39,
+        minLength: 5,
+        maxLength: 39,
         unique: true
     },
-    
+
     phone: {
-      type:Number
+        type: Number
     },
-    avatar: { 
-      type: String,
-      unique: true
-      },
+    avatar: {
+        type: String,
+        unique: true
+    },
     password: {
-      type: String, 
-      minLength:7,
+        type: String,
+        minLength: 7
     },
-      
+
     mate: {
         type: String,
-        minLength:4,
-        maxLength:5,
+        minLength: 4,
+        maxLength: 5
     },
-    
+
     faculty: {
-      type:String,
-      minLength:3,
-      maxLength:20,
+        type: String,
+        minLength: 3,
+        maxLength: 20
     },
     department: {
-      type:String,
-      minLength:3,
-      maxLength:20,
+        type: String,
+        minLength: 3,
+        maxLength: 20
     },
-    
-    tokens: { 
-      type: Number,
-      default: 0,
-      required:true,
+
+    tokens: {
+        type: Number,
+        default: 0,
+        required: true
     },
     OTP: Number,
 
@@ -64,34 +64,42 @@ const UserSchema = new mongoose.Schema({
 export const PermiumUser = mongoose.model("PermiumUser", UserSchema);
 
 export async function deductTokens(id, amount, notes) {
-        const user = await PermiumUser.findById(id);
-        if (!user) throw new Error(`User  not found`);
+    const user = await PermiumUser.findById(id);
+    if (!user) throw new Error(`User  not found`);
 
-if (user.tokens + amount < 0) throw new Error(`Insufficient tokens. Current balance: ${user.tokens}`);
+    if (user.tokens + amount < 0)
+        throw new Error(`Insufficient tokens. Current balance: ${user.tokens}`);
 
-const trans = {
-            transId: Date.now(),
-            action: notes,
-            cost: amount,
-            balance: user.tokens + amount,
-            date: getDateOnly(),
-            time: getTimeOnly()
-        };
+    const trans = {
+        transId: Date.now(),
+        status: "successful",
+        action: notes,
+        cost: amount,
+        balance: user.tokens + amount,
+        date: getDateOnly(),
+        time: getTimeOnly()
+    };
 
-        // Initialize details if not exists
-        if (!user.details) user.details = { Transactions: [] };
-        if (!user.details.Transactions) user.details.Transactions = [];
+    // Initialize details if not exists
+    if (!user.details) user.details = { Transactions: [] };
+    if (!user.details.Transactions) user.details.Transactions = [];
 
-        user.tokens += amount;
-        user.details.Transactions.push(trans);
-        user.markModified("details"); // Important for mixed types
+    user.tokens += amount;
+    user.details.Transactions.unshift(trans);
+    user.markModified("details"); // Important for mixed types
 
-        await user.save();
-        return true;
-
+    await user.save();
+    return {
+     id : id,
+     gmail:user.gmail,
+     password:user.password,
+     wallet:user.wallet,
+     tokens:user.tokens,
+     avatar:user.avatar
+    };
 }
 
- function getDateOnly(locale = "en-US", options = {}) {
+function getDateOnly(locale = "en-US", options = {}) {
     return new Intl.DateTimeFormat(locale, {
         year: "numeric",
         month: "long",
@@ -101,7 +109,7 @@ const trans = {
 }
 // Example output: "November 15, 2023"
 
- function getTimeOnly(locale = "en-US", options = {}) {
+function getTimeOnly(locale = "en-US", options = {}) {
     return new Intl.DateTimeFormat(locale, {
         hour: "2-digit",
         minute: "2-digit",
