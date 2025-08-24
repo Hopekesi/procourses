@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         lowercase: true,
         minLength: 5,
-        maxLength: 39,
+        maxLength: 70,
         unique: true
     },
 
@@ -39,12 +39,12 @@ const UserSchema = new mongoose.Schema({
     faculty: {
         type: String,
         minLength: 3,
-        maxLength: 20
+        maxLength: 35
     },
     department: {
         type: String,
         minLength: 3,
-        maxLength: 20
+        maxLength: 35
     },
 
     tokens: {
@@ -90,12 +90,12 @@ export async function deductTokens(id, amount, notes) {
 
     await user.save();
     return {
-     id : id,
-     gmail:user.gmail,
-     password:user.password,
-     wallet:user.wallet,
-     tokens:user.tokens,
-     avatar:user.avatar
+        id: id,
+        gmail: user.gmail,
+        password: user.password,
+        wallet: user.wallet,
+        tokens: user.tokens,
+        avatar: user.avatar
     };
 }
 
