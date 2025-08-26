@@ -55,6 +55,15 @@ let githubRaw = axios.create({
 
 export async function getCourses(req, res) {
     try {
+     
+//find userby ID
+        let id = req.params.id;
+        const user = await PermiumUser.findById(id);
+        //validation
+        if (!user) throw new Error(`User  not found`);
+        if (user.tokens < 1) throw new Error(`Insufficient Tokens`);
+     
+     
         await selectToken();
         //get the courses
         const onlineCourses = await githubApi.get(`/users/UniportPQ/repos`);
@@ -70,6 +79,14 @@ export async function getCourses(req, res) {
 
 export async function getCoursesD(req, res) {
     try {
+     
+//find userby ID
+        let id = req.params.id;
+        const user = await PermiumUser.findById(id);
+        //validation
+        if (!user) throw new Error(`User  not found`);
+        if (user.tokens < 1) throw new Error(`Insufficient Tokens`);
+     
         await selectToken();
 
         //get the courses
@@ -90,13 +107,22 @@ export async function getCoursesD(req, res) {
 }
 
 export async function getSessions(req, res) {
+    try {
+
+//find userby ID
+        let id = req.params.id;
+        const user = await PermiumUser.findById(id);
+        //validation
+        if (!user) throw new Error(`User  not found`);
+        if (user.tokens < 1) throw new Error(`Insufficient Tokens`);
+     
+     
     let course = req.params.course;
 
     if (typeof course !== "string") throw new Error("Select a course ");
 
     await selectToken();
 
-    try {
         let availableYears = await githubApi.get(
             `/repos/UniportPQ/${course}/contents/`
         );
